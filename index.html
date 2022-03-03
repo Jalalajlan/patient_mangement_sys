@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <title>Document</title>
+    <style>
+      .container {
+        margin-top: 50px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .btn {
+        margin-right: 10px;
+      }
+
+      .add-patients {
+        float: right;
+        margin: 150px 60px 0px 0px;
+        width: 20%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <table class="table" id="tbl">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Patient Name</th>
+            <th>Mobile No</th>
+            <th>Patient Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <a href="add.html" class="btn btn-primary add-patients">Add Patient</a>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+      $(function () {
+        // displaying patients information
+        $.ajax({
+          type: "get",
+          url: "http://localhost:8888/patients",
+          dataType: "json",
+          success: function (data) {
+            index = 0;
+            for (var x in data) {
+              index++;
+
+              var status = "";
+              var statusDate = "";
+
+              if (data[x].status == 1) {
+                status = "Admission";
+                statusDate = data[x].admissiondate;
+              } else if (data[x].status == "ICU") {
+                status = "ICU admission";
+                statusDate = data[x].icuadmissiondate;
+              } else if (data[x].status == "Clinical Death") {
+                status = "Clinical death";
+                statusDate = data[x].clinicaldeathdate;
+              } else if (data[x].status == "Discharge") {
+                status = "Discharge";
+                statusDate = data[x].dischargedate;
+              }
+
+              $("#tbl tbody").append(
+                "<tr>" +
+                  "   <td>" +
+                  index +
+                  "</td>" +
+                  "   <td><a href='display.html?id=" +
+                  data[x].id +
+                  "'>" +
+                  data[x].name +
+                  "</a></td>" +
+                  "   <td>" +
+                  data[x].mobileno +
+                  "</td>" +
+                  "   <td>" +
+                  status +
+                  "<br />" +
+                  statusDate +
+                  "</td>" +
+                  "   <td><a  class='btn btn-info' href='display.html?id=" +
+                  data[x].id +
+                  "'>View Patient</a>" +
+                  "<a class='btn btn-info'  href='update.html?id=" +
+                  data[x].id +
+                  "'>Update Patient</a>" +
+                  "<button type='button' class='btn btn-warning btn-sm' data-id='" +
+                  data[x].id +
+                  "' data-status='ICU'>Set ICU</button>" +
+                  "<button type='button' class='btn btn-danger btn-sm'  data-id='" +
+                  data[x].id +
+                  "' data-status='Clinical Death'>Set Clinical Death</button>" +
+                  "<button type='button' class='btn btn-danger btn-sm' data-id='" +
+                  data[x].id +
+                  "' data-status='Discharge'>Set Discharge</button>"
+              );
+            }
+          },
+          error: function () {
+            console.log("error");
+          },
+        });
+
+        // editiong status information
+        $("#tbl").on("click", "button", function () {
+          var patientId = this.getAttribute("data-id");
+          var status = this.getAttribute("data-status");
+
+          var patient = new Object();
+          patient.status = status;
+
+          $.ajax({
+            type: "put",
+            url: "http://localhost:8888/patients/status/" + patientId,
+            contentType: "application/json",
+            data: JSON.stringify(patient),
+            dataType: "json",
+            success: function (data) {
+              setTimeout(() => {
+                window.location.href = "index.html";
+              }, 2000);
+            },
+            error: function () {
+              console.log("error");
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

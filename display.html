@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <title>Document</title>
+    <style>
+      .container {
+        margin-top: 50px;
+      }
+
+      .main-page {
+        width: 15%;
+        margin-left: 63px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <table class="table" id="tbl">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Patient Name</th>
+            <th>Gender</th>
+            <th>Age</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <a href="index.html" class="btn btn-primary main-page">main page</a>
+    <script>
+      $(function () {
+        var getUrlParameter = function (parameterName) {
+          let parameter = new URLSearchParams(window.location.search);
+          return parameter.get(parameterName);
+        };
+
+        var id = getUrlParameter("id");
+
+        $.ajax({
+          type: "get",
+          url: "http://localhost:8888/patients/" + id,
+          dataType: "json",
+          success: function (data) {
+            console.log(data);
+            var status = "";
+            var statusDate = "";
+
+            if (data.status == 1) {
+              status = "Admission";
+              statusDate = data.admissiondate;
+            } else if (data.status == "ICU") {
+              status = "ICU admission";
+              statusDate = data.icuadmissiondate;
+            } else if (data.status == "Clinical Death") {
+              status = "Clinical death";
+              statusDate = data.clinicaldeathdate;
+            } else if (data.status == "Discharge") {
+              status = "Discharge";
+              statusDate = data.dischargedate;
+            }
+
+            $("#tbl tbody").append(
+              "<tr>" +
+                "   <td>" +
+                id +
+                "</td>" +
+                "   <td><a href='display.html?id=" +
+                data.id +
+                "'>" +
+                data.name +
+                "</a></td>" +
+                "   <td>" +
+                data.gender +
+                "</td>" +
+                "   <td>" +
+                data.age +
+                "</td>" +
+                "   <td>" +
+                data.address +
+                "</td>" +
+                "   <td>" +
+                data.city +
+                "</td>" +
+                "   <td>" +
+                data.state +
+                "</td>" +
+                "   <td>" +
+                status +
+                "<br />" +
+                statusDate +
+                "</td>"
+            );
+          },
+          error: function () {
+            console.log("error");
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

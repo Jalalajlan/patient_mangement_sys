@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <title>Document</title>
+    <style>
+      .form-container {
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+      }
+      .btn {
+        margin-top: 20px;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form-container">
+      <form id="form1">
+        <input type="text" id="id" readonly hidden /><br /><br />
+
+        <label for="name">Name:</label><br />
+        <input type="text" class="form-control" id="name" />
+
+        <label for="gender">Gender:</label><br />
+        <select id="gender" class="form-control">
+          <option value="0">choose gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+
+        <label for="age">Age:</label><br />
+        <input type="text" class="form-control" id="age" />
+
+        <label for="address">Address:</label><br />
+        <textarea
+          id="address"
+          class="form-control"
+          rows="4"
+          cols="50"
+        ></textarea>
+
+        <label for="city">City:</label><br />
+        <input type="text" class="form-control" id="city" />
+
+        <label for="state">State:</label><br />
+        <input type="text" class="form-control" id="state" />
+
+        <label for="mobileno">Mobile No:</label><br />
+        <input type="text" class="form-control" id="mobileno" />
+
+        <input class="btn btn-primary" type="submit" value="Submit" />
+        <br />
+        <br />
+        <br />
+        <a href="index.html">Main Page</a>
+      </form>
+      <script>
+        $(function () {
+          var getUrlParameter = function (parameterName) {
+            let parameter = new URLSearchParams(window.location.search);
+            return parameter.get(parameterName);
+          };
+
+          var id = getUrlParameter("id");
+
+          $.ajax({
+            type: "get",
+            url: "http://localhost:8888/patients/" + id,
+            dataType: "json",
+            success: function (data) {
+              $("#id").val(data.id);
+              $("#name").val(data.name);
+              $("#gender").val(data.gender);
+              $("#age").val(data.age);
+              $("#address").val(data.address);
+              $("#city").val(data.city);
+              $("#state").val(data.state);
+              $("#mobileno").val(data.mobileno);
+            },
+            error: function () {
+              console.log("error");
+            },
+          });
+
+          $("#form1").submit(function (event) {
+            event.preventDefault();
+
+            var id = $("#id").val();
+            var patient = new Object();
+            patient.name = $("#name").val();
+            patient.gender = $("#gender").val();
+            patient.age = $("#age").val();
+            patient.address = $("#address").val();
+            patient.city = $("#city").val();
+            patient.state = $("#state").val();
+            patient.mobileno = $("#mobileno").val();
+
+            $.ajax({
+              type: "put",
+              url: "http://localhost:8888/patients/" + id,
+              contentType: "application/json",
+              data: JSON.stringify(patient),
+              dataType: "json",
+              success: function (data) {
+                setTimeout(() => {
+                  window.location.href = "index.html";
+                }, 2000);
+              },
+              error: function () {
+                console.log("error");
+              },
+            });
+          });
+        });
+      </script>
+      <br />
+    </div>
+  </body>
+</html>
